@@ -19,5 +19,12 @@ pipeline {
                 }
             }
         }
+        
+        stage ('Docker Image creation') {
+            steps {
+               sh "docker build -t helloworld ."
+               sh "docker run --name helloworld -p 8080:8080 -d helloworld"
+            }
+        }
     }
 }
