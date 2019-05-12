@@ -1,0 +1,75 @@
+---
+# tasks file for docker_assign
+#Install docker
+
+- hosts: aws
+  become: true
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
+
+  tasks:
+  - name: "APT - install misc packages"
+    apt:
+##      name: "{{ item }}"
+      name: ['apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common']
+      update_cache: yes
+##    with_items:
+##      - "aptitude"
+##      - "apt-transport-https"
+##      - "ca-certificates"
+##      - "curl"
+##      - "software-properties-common"
+  - name: "APT - Add Docker GPG key"
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+
+  - name: add fingerprint
+    apt_key:
+      id: 0EBFCD88
+      state: present
+
+  - name: "Add Docker repository"
+    apt_repository:
+      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial edge
+      state: present
+      filename: docker
+
+  - name: Update apt packages
+    apt:
+      update_cache: yes
+
+  - name: "install docker-ce"
+    apt:
+      name: docker-ce
+      state: present
+      update_cache: yes
+
+#Enable the docker service
+  - name: Ensure Docker is started and enabled at boot.
+    service:
+      name: docker
+      state: started
+      enabled: true
+
+#Install maven and set JAVA_HOME
+  - name: Install maven
+    become: yes
+    apt: pkg={{ item }} state=latest update_cache=yes
+    with_items:
+      - maven
+
+  - name: Set JAVA_HOME
+    lineinfile:
+      dest: /etc/environment
+      state: present
+      regexp: '^JAVA_HOME'
+      line: 'JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk'
+
+#Add dockeruser to docker and sudoers group
+
+  - name: Add users to "docker" group
+    user:
+      name: "dockeruser"
+      groups: "docker,sudo"
+      append: yes
