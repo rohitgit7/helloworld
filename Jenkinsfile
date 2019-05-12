@@ -1,15 +1,10 @@
 pipeline {
     agent any
-    stages {
-        stage ('Initialize') {
-            steps {
-                def mvnHome = tool 'M3'
-            }
-        }
-        
+    stages {      
         stage ('Checkout') {
             steps {
-               git url: 'https://github.com/kuberguy/helloworld.git' 
+               git url: 'https://github.com/kuberguy/helloworld.git'
+               def mvnHome = tool 'M3'
             }
         }
 
