@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: helloworldpod
+  labels:
+    app: hello_world
+spec:
+  containers:
+  - name: k8s-demo
+    image: rohitdocker7/my_docker_repo
+    ports:
+    - name: app-port
+      containerPort: 3000
